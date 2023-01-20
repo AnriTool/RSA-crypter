@@ -21,14 +21,8 @@ MODULUS_F = int()
 ORIGINAL_TEXT = ""
 CRYPTED_TEXT = ""
 
-
+# https://github.com/redmolle/Diffie_Hellman_KeyExchange/blob/master/Diffie_Hellman_KeyExchange/prime.py
 def is_prime(n, k=128):
-    """ Test if a number is prime
-        Args:
-            n -- int -- the number to test
-            k -- int -- the number of tests to do
-        return True if n is prime
-    """
     # Test if n is not even.
     # But care, 2 is prime !
     if n == 2 or n == 3:
@@ -71,18 +65,12 @@ def generate_prime_candidate(length):
 
 
 def generate_prime_number(length):
-    """ Generate a prime
-        Args:
-            length -- int -- length of the prime to generate, in          bits
-        return a prime
-    """
     p = 4
-    # keep generating while the primality test fail
     while not is_prime(p, 128):
         p = generate_prime_candidate(length)
     return p
 
-
+# https://www.techiedelight.com/extended-euclidean-algorithm-implementation/
 def extended_gcd(a, b):
     if a == 0:
         return b, 0, 1
@@ -172,8 +160,6 @@ def selectPubKey():
         lines = fp.readlines()
         PUBLIC_KEY = int(re.findall("\d+",lines[1])[0])
         PUBLIC_EXP = int(re.findall("\d+", lines[2])[0])
-    print(PUBLIC_KEY)
-    print(PUBLIC_EXP)
 
 def encrypt():
     if text_pubkey_path.get() == "":
@@ -199,7 +185,6 @@ def encrypt():
                     "\t\tcontentType TEXT\n" + \
                     "\t\tcontentEncryptionAlgorithmIdentifier rsaEncryption\n"+\
                     "encryptedContent " + str(crypt) + "\n}"
-        print(encrypted)
 
         folder_selected = filedialog.askdirectory()
         with open(folder_selected+"/"+crypt_file_name.get()+".encrypted", 'w') as fp:
@@ -238,8 +223,6 @@ def selectPrKey():
         PRIVATE_KEY = int(re.findall("\d+", lines[3])[0])
         if '-' in lines[3]:
             PRIVATE_KEY = 0 - PRIVATE_KEY
-    print(PUBLIC_KEY)
-    print(PRIVATE_KEY)
 
 def selectCryptFile():
     global CRYPTED_TEXT
@@ -255,7 +238,6 @@ def selectCryptFile():
     with open(file, 'r') as fp:
         lines = fp.readlines()
         CRYPTED_TEXT =re.findall("\d+", lines[3])[0]
-        print(CRYPTED_TEXT)
 
 
 def decrypt():
@@ -277,7 +259,6 @@ def decrypt():
         decrypted_text = ""
         for i in decrypt:
             decrypted_text = decrypted_text + chr(pow(i, PRIVATE_KEY, PUBLIC_KEY))
-        print(decrypted_text)
 
         folder_selected = filedialog.askdirectory()
         with open(folder_selected + "/" + decrypt_file_name.get() + ".decrypted.txt", 'w') as fp:
@@ -306,11 +287,11 @@ style.configure('lefttab.TNotebook', tabposition='wn')
 notebook = Notebook(root, style='lefttab.TNotebook')
 notebook.pack(pady=10, expand=True)
 
-# ------Generate tab------
+# ------Generate tab
 frame_gen = Frame(notebook, width=450, height=450)
 Label(frame_gen, text="Generate keys").pack(side=TOP)
 
-# --------------Bits selection--------------
+# --------------------Bits selection
 fr_bit_select = LabelFrame(frame_gen, text="Bits selection", width=420, height=140)
 Label(fr_bit_select, text="Bit count: ").pack(side=LEFT, padx= 30)
 
@@ -321,9 +302,9 @@ cb_bit_select.pack(side=LEFT, padx=30)
 btn_bit_select = Button(fr_bit_select, text="Submit", command=genPQ)
 btn_bit_select.pack(side=LEFT, padx=30, pady=5)
 fr_bit_select.pack(fill="both",side=TOP)
-# ---------------------------------------------
+#
 
-# ------------Firma number selection-----------
+# --------------------Firma number selection
 fr_open_e = LabelFrame(frame_gen, text="Fermat number", width=420, height=140)
 Label(fr_open_e, text="Bit count: ").pack(side=LEFT, padx= 30)
 
@@ -334,12 +315,12 @@ cb_open_e.pack(side=LEFT, padx=30)
 btn_open_e = Button(fr_open_e, text="Submit", state="disable", command=openECheck)
 btn_open_e.pack(side=LEFT, padx=30, pady=5)
 fr_open_e.pack(fill="both",side=TOP)
-# ---------------------------------------------
+#
 
-# ----------------Saving keys------------------
+# --------------------Saving keys
 fr_save_keys = LabelFrame(frame_gen, text="Saving keys", width=420, height=140)
 
-# ----------------------Saving path----------------------
+# ------------------------------------------Saving path
 fr_save_path = Frame(fr_save_keys, width=420, height=140)
 Label(fr_save_path, text="Save path: ").grid(row=0, column=0, padx=30)
 
@@ -350,9 +331,9 @@ btn_choose_folder = Button(fr_save_path,text="Select path", width=11, command=se
 btn_choose_folder.grid(row=1, column=1,  pady=5)
 
 fr_save_path.pack(side=TOP)
-# ----------------------------------------------------------
+#
 
-# -----------------------Name select------------------------
+# -------------------------------------------Name select
 fr_file_name = Frame(fr_save_keys, width=420, height=140)
 Label(fr_file_name, text="Key's name:").grid(row=0, column=0, padx=28)
 text_file_name = Entry(fr_file_name, width=50, )
@@ -360,10 +341,10 @@ text_file_name.grid(row=0, column=1, padx=30)
 btn_file_save = Button(fr_file_name, text="Save keys", width=11, state="disable", command=saveKeys)
 btn_file_save.grid(row=1, column=1, pady=5)
 fr_file_name.pack(side=TOP)
-# ----------------------------------------------------------
+#
 
 fr_save_keys.pack(fill="both",side=TOP)
-# ---------------------------------------------
+#
 
 frame_gen.pack(side=TOP)
 # -------------------------------
@@ -375,7 +356,7 @@ frame_gen.pack(side=TOP)
 frame_crypt = Frame(notebook, width=450, height=450)
 Label(frame_crypt, text="Encrypt text").pack(side=TOP)
 
-# ------------Files select------------
+# --------------------Files select
 fr_pub_key_select = LabelFrame(frame_crypt, text="Files selection", width=420, height=140)
 
 Label(fr_pub_key_select, text="Public key:").grid(row=0, column=0, padx=30)
@@ -395,10 +376,10 @@ btn_choose_text = Button(fr_pub_key_select,text="Select text file", width=11, co
 btn_choose_text.grid(row=3, column=1,  pady=5)
 
 fr_pub_key_select.pack(fill="both",side=TOP)
-# ------------------------------------
 
-# ----------------------Saving path----------------------
+# --------------------Saving path
 fr_save_crypted = Frame(frame_crypt, width=420, height=140)
+
 btn_encrypt = Button(fr_save_crypted, text="Encrypt data", width=11, command=encrypt)
 btn_encrypt.grid(row=1, column=2,padx=10 , pady=5)
 
@@ -407,7 +388,7 @@ crypt_file_name = Entry(fr_save_crypted, width=22)
 crypt_file_name.grid(row=1, column=1,)
 
 fr_save_crypted.pack(side=TOP)
-# ----------------------------------------------------------
+#
 
 frame_crypt.pack(side=TOP)
 # ---------------------
@@ -418,7 +399,7 @@ frame_decrypt = Frame(notebook, width=450, height=450)
 
 Label(frame_decrypt, text="Encrypt text").pack(side=TOP)
 
-# ------------Files select------------
+# --------------------Files select
 fr_pr_key_select = LabelFrame(frame_decrypt, text="Files selection", width=420, height=140)
 
 Label(fr_pr_key_select, text="Prvate key:").grid(row=0, column=0, padx=30)
@@ -438,9 +419,9 @@ btn_choose_crypted = Button(fr_pr_key_select,text="Select data", width=11, comma
 btn_choose_crypted.grid(row=3, column=1,  pady=5)
 
 fr_pr_key_select.pack(fill="both",side=TOP)
-# ------------------------------------
+#
 
-# ----------------------Saving path----------------------
+# --------------------Saving path
 fr_save_decrypted = Frame(frame_decrypt, width=420, height=140)
 btn_decrypt = Button(fr_save_decrypted, text="Decrypt data", width=11, command=decrypt)
 btn_decrypt.grid(row=1, column=2,padx=10 , pady=5)
@@ -450,36 +431,13 @@ decrypt_file_name = Entry(fr_save_decrypted, width=22, )
 decrypt_file_name.grid(row=1, column=1,)
 
 fr_save_decrypted.pack(side=TOP)
-# ----------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ------------
 
 frame_decrypt.pack(side=TOP)
-
 
 notebook.add(frame_gen, text='Generate')
 notebook.add(frame_crypt, text='Encrypt')
 notebook.add(frame_decrypt, text='Decrypt')
-
 
 root.mainloop()
 
